@@ -1,0 +1,19 @@
+{
+  "name": "blue_bird",
+  "version": "1.0.0",
+  "description": "flashcards application",
+  "main": "app.js",
+  "repository": "https://github.com/mauri1789/blue-bird",
+  "author": "Mauricio Alarcon",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0"
+  },
+  "scripts": {
+    "test": "mocha tests/unit/"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4"
+  }
+}

@@ -1,0 +1,40 @@
+openapi: 3.0.0
+
+info:
+  title: blue bird API
+  version: 1.0
+
+paths:
+  /collections:
+    get:
+      summary: Returns a list of collections by user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collection'
+        "400":
+          description: The specified user ID is invalid.
+        "500":
+          description: Bad request.
+        default:
+          description: Unexpected error.
+
+
+components:
+  schemas:
+    Collection:
+      type: object
+      properties:
+        collection_id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      required:
+        - collection_id
+        - name

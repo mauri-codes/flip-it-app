@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: bluebird infrastructure
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  BluebirdAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri: swaggerSpec.yaml
+      StageName: dev
+
+  GetCollections:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: blue-bird-get-collections
+      Runtime: nodejs8.10
+      Handler: api.get_collections
+      CodeUri: app/
+      Events:
+        GetCollectionsAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "BluebirdAPI"
+            Path: /collections
+            Method: get
