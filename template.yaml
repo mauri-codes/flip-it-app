@@ -2,6 +2,15 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: bluebird infrastructure
 
+Parameters:
+  DeploymentBucket:
+    Type: String
+    Description: The name of the S3 bucket in which packaged code is stored
+  StageName:
+    Type: String
+    Description: Current Stage
+    Default: dev
+
 Globals:
   Function:
     Timeout: 3
@@ -10,13 +19,15 @@ Resources:
   BluebirdAPI:
     Type: AWS::Serverless::Api
     Properties:
+      Name: bluebird-api
       DefinitionUri: swaggerSpec.yaml
-      StageName: dev
+      StageName:
+        Ref: StageName
 
   GetCollections:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: blue-bird-get-collections
+      FunctionName: bluebird-get-collections
       Runtime: nodejs8.10
       Handler: api.get_collections
       CodeUri: app/
@@ -26,4 +37,4 @@ Resources:
           Properties:
             RestApiId: !Ref "BluebirdAPI"
             Path: /collections
-            Method: get
+            Method: GET

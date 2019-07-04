@@ -7,7 +7,8 @@ info:
 paths:
   /collections:
     get:
-      summary: Returns a list of collections by user
+      summary: Returns a list of collections by user\
+      x-amazon-apigateway-request-validator: 'params-only'
       responses:
         "200":
           description: OK
@@ -23,6 +24,16 @@ paths:
           description: Bad request.
         default:
           description: Unexpected error.
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-get-collections/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
 
 
 components:
