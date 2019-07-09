@@ -1,7 +1,7 @@
 // const axios = require('axios')
 let response;
 
-exports.get_collections = async (event, context) => {
+exports.get = async (event, context) => {
     try {
         response = {
             'statusCode': 200,

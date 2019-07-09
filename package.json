@@ -2,7 +2,7 @@
   "name": "blue_bird",
   "version": "1.0.0",
   "description": "flashcards application",
-  "main": "app.js",
+  "main": "app/collections.js",
   "repository": "https://github.com/mauri1789/blue-bird",
   "author": "Mauricio Alarcon",
   "license": "MIT",
@@ -10,7 +10,10 @@
     "axios": "^0.18.0"
   },
   "scripts": {
-    "test": "mocha tests/unit/"
+    "test": "mocha app/tests/unit/",
+    "deploy": "./deployment.sh --create",
+    "delete": "./deployment.sh --delete",
+    "local": "sam local start-api"
   },
   "devDependencies": {
     "chai": "^4.2.0",

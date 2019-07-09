@@ -29,7 +29,7 @@ Resources:
     Properties:
       FunctionName: bluebird-get-collections
       Runtime: nodejs8.10
-      Handler: api.get_collections
+      Handler: collections.get
       CodeUri: app/
       Events:
         GetCollectionsAPI:

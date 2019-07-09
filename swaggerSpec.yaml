@@ -1,7 +1,7 @@
 openapi: 3.0.0
 
 info:
-  title: blue bird API
+  title: blue bird flashcards API
   version: 1.0
 
 paths:
@@ -25,8 +25,7 @@ paths:
         default:
           description: Unexpected error.
       x-amazon-apigateway-integration:
-        uri:
-          Fn::Sub: arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-get-collections/invocations
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-get-collections/invocations"
         responses:
           default:
             statusCode: "200"
