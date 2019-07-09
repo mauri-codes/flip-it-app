@@ -3,9 +3,19 @@ export AWS_REGION=us-east-2
 export STAGE_NAME=dev
 export DEPLOYMENTS_BUCKET=mau-deployments
 
+
 if [ $1 = "-c" ] || [ $1 = "--create" ]
 then
-  sed "s/{{Account}}/$AWS_ACCOUNT/g" swaggerSpec.yaml | sed "s/{{Region}}/${AWS_REGION}/g" > temp-swagger.yaml
+
+  if ! aws s3api head-bucket --bucket $DEPLOYMENTS_BUCKET 2>/dev/null
+  then
+    aws s3api create-bucket \
+      --bucket $DEPLOYMENTS_BUCKET \
+      --region $AWS_REGION  \
+      --create-bucket-configuration LocationConstraint=$AWS_REGION
+  fi
+
+  sed "s/{{Account}}/$AWS_ACCOUNT/g" swaggerSpec.yaml | sed "s/{{Region}}/$AWS_REGION/g" > temp-swagger.yaml
   cp swaggerSpec.yaml original-swagger.yaml
   cp temp-swagger.yaml swaggerSpec.yaml
 
@@ -31,4 +41,3 @@ if [ $1 = "-d" ] || [ $1 = "--delete" ]
 then
   aws cloudformation delete-stack --stack-name blue-bird
 fi
-
