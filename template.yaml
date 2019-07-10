@@ -46,7 +46,7 @@ Resources:
       FunctionName: bluebird-get-collection
       Runtime: nodejs8.10
       Handler: collections.get
-      CodeUri: app/
+      CodeUri: build
       Environment:
         Variables:
           COLLECTIONS_TABLE: !Ref CollectionsTable
@@ -58,13 +58,13 @@ Resources:
             Path: /collections
             Method: GET
 
-  GetCollections:
+  PutCollections:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: bluebird-put-collection
       Runtime: nodejs8.10
       Handler: collections.put
-      CodeUri: app/
+      CodeUri: build
       Environment:
         Variables:
           COLLECTIONS_TABLE: !Ref CollectionsTable

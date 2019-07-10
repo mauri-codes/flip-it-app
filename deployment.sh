@@ -15,6 +15,13 @@ then
       --create-bucket-configuration LocationConstraint=$AWS_REGION
   fi
 
+  mkdir -p build
+  cp -r app/* build/
+  cp package.json build/
+  cd build
+  npm install
+  cd ..
+
   sed "s/{{Account}}/$AWS_ACCOUNT/g" swaggerSpec.yaml | sed "s/{{Region}}/$AWS_REGION/g" > temp-swagger.yaml
   cp swaggerSpec.yaml original-swagger.yaml
   cp temp-swagger.yaml swaggerSpec.yaml
@@ -35,6 +42,7 @@ then
   rm temp-swagger.yaml
   rm original-swagger.yaml
   rm packaged.yaml
+  rm -rf build
 fi
 
 if [ $1 = "-d" ] || [ $1 = "--delete" ]

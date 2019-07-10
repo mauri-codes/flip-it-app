@@ -2,3 +2,4 @@ packaged.yaml
 original-swagger.yaml
 temp-swagger.yaml
 node_modules
+build
