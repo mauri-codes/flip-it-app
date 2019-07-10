@@ -33,7 +33,7 @@ then
   sam deploy \
     --template-file packaged.yaml \
     --stack-name blue-bird \
-    --capabilities CAPABILITY_IAM \
+    --capabilities CAPABILITY_NAMED_IAM \
     --parameter-overrides \
       StageName=$STAGE_NAME \
       DeploymentBucket=$DEPLOYMENTS_BUCKET

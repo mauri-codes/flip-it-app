@@ -16,6 +16,36 @@ Globals:
     Timeout: 3
 
 Resources:
+  BluebirdLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bluebird-lambda-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Policies:
+        - PolicyName: bluebird-lambda-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:DescribeTable
+                  - dynamodb:UpdateTable
+                  - dynamodb:DeleteItem
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:Query
+                  - dynamodb:UpdateItem
+                Resource:
+                  - !GetAtt CollectionsTable.Arn
+
   BluebirdAPI:
     Type: AWS::Serverless::Api
     Properties:
@@ -40,13 +70,14 @@ Resources:
           AttributeName: "collectionId"
           KeyType: "HASH"
 
-  GetCollections:
+  GetCollection:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: bluebird-get-collection
       Runtime: nodejs8.10
       Handler: collections.get
       CodeUri: build
+      Role: !GetAtt BluebirdLambdaRole.Arn
       Environment:
         Variables:
           COLLECTIONS_TABLE: !Ref CollectionsTable
@@ -58,13 +89,14 @@ Resources:
             Path: /collections
             Method: GET
 
-  PutCollections:
+  PutCollection:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: bluebird-put-collection
       Runtime: nodejs8.10
       Handler: collections.put
       CodeUri: build
+      Role: !GetAtt BluebirdLambdaRole.Arn
       Environment:
         Variables:
           COLLECTIONS_TABLE: !Ref CollectionsTable
