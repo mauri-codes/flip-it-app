@@ -1,14 +1,16 @@
 const axios = require('axios')
 var AWS = require('aws-sdk');
 
-var dynamo = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+var dynamo = new AWS.DynamoDB.DocumentClient()
 var collectionsTable = process.env.COLLECTIONS_TABLE
 
 let response;
 
 exports.get = async (event, context) => {
     try {
-        var outcome = getDynamoItem(collectionsTable, "collectionId")
+        console.log({event: event})
+        console.log({context: context})
+        var outcome = await getDynamoItem(collectionsTable, "collectionId")
         console.log(outcome)
         response = {
             'statusCode': 200,
@@ -30,12 +32,14 @@ exports.get = async (event, context) => {
 
 exports.put = async (event, context) => {
     try {
+        console.log({event: event})
+        console.log({context: context})
         var item = {
             'collectionId' : {S: '123'},
             'name' : {S: 'Med cards'},
             'user' : {S: 'Richard Roe'}
           }
-        var outcome = putDynamoItem(collectionsTable, item)
+        var outcome = await putDynamoItem(collectionsTable, item)
         console.log(outcome)
         response = {
             'statusCode': 200,
@@ -55,19 +59,21 @@ exports.put = async (event, context) => {
     return response
 };
 
-const getDynamoItem = async (table, key) => {
+const getDynamoItem = (table, key) => {
     var params = {
         TableName: table,
         Key: {
             'KEY_NAME': {S: key}
         }
     }
-    dynamo.getItem(params, function(err, data) {
-        if (err) {
-            console.log("Error", err);
-        } else {
-            console.log("Success", data.Item);
-        }
+    return new Promise((res, rej) => {
+        dynamo.get(params, function(err, data) {
+            if(err) {
+                rej(err);
+            } else {
+                res(`Success ${data.Item}`);
+            }
+        })
     })
 }
 const putDynamoItem = async (table, item) => {
@@ -75,11 +81,13 @@ const putDynamoItem = async (table, item) => {
         TableName: table,
         Item: item
     }
-    await dynamo.putItem(params, function(err, data) {
-        if(err) {
-            console.log("Error: ", err)
-        } else {
-            console.log("Success", data)
-        }
+    return new Promise((res, rej) => {
+        dynamo.put(params, function(err, data) {
+            if(err) {
+                rej(err);
+            } else {
+                res("Success");
+            }
+        })
     })
 }
