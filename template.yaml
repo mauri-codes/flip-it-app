@@ -24,17 +24,54 @@ Resources:
       StageName:
         Ref: StageName
 
+  CollectionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: bluebird-collections
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      AttributeDefinitions: 
+        - 
+          AttributeName: "collectionId"
+          AttributeType: "S"
+      KeySchema:
+        - 
+          AttributeName: "collectionId"
+          KeyType: "HASH"
+
   GetCollections:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: bluebird-get-collections
+      FunctionName: bluebird-get-collection
       Runtime: nodejs8.10
       Handler: collections.get
       CodeUri: app/
+      Environment:
+        Variables:
+          COLLECTIONS_TABLE: !Ref CollectionsTable
       Events:
-        GetCollectionsAPI:
+        GetCollectionAPI:
           Type: Api
           Properties:
             RestApiId: !Ref "BluebirdAPI"
             Path: /collections
             Method: GET
+
+  GetCollections:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: bluebird-put-collection
+      Runtime: nodejs8.10
+      Handler: collections.put
+      CodeUri: app/
+      Environment:
+        Variables:
+          COLLECTIONS_TABLE: !Ref CollectionsTable
+      Events:
+        PutCollectionsAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "BluebirdAPI"
+            Path: /collections
+            Method: PUT

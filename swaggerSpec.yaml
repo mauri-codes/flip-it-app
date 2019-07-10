@@ -7,8 +7,7 @@ info:
 paths:
   /collections:
     get:
-      summary: Returns a list of collections by user\
-      x-amazon-apigateway-request-validator: 'params-only'
+      summary: Returns a list of collections by user
       responses:
         "200":
           description: OK
@@ -25,7 +24,7 @@ paths:
         default:
           description: Unexpected error.
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-get-collections/invocations"
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-get-collection/invocations"
         responses:
           default:
             statusCode: "200"
@@ -33,18 +32,38 @@ paths:
         httpMethod: "GET"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
-
+    put:
+      summary: saves or replaces a user collection
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: The specified user ID is invalid.
+        "500":
+          description: Bad request.
+        default:
+          description: Unexpected error.
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-put-collection/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "PUT"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
 
 components:
   schemas:
     Collection:
       type: object
       properties:
-        collection_id:
-          type: integer
-          format: int64
+        collectionId:
+          type: string
         name:
           type: string
+        user:
+          type: string
       required:
-        - collection_id
+        - collectionId
         - name
