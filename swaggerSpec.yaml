@@ -32,11 +32,12 @@ paths:
           description: Unexpected error.
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-get-collection/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/bluebird-gateway-role"
         responses:
           default:
             statusCode: "200"
         passthroughBehavior: "when_no_match"
-        httpMethod: "GET"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
   /collection:
@@ -53,11 +54,12 @@ paths:
           description: Unexpected error.
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-put-collection/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/bluebird-gateway-role"
         responses:
           default:
             statusCode: "200"
         passthroughBehavior: "when_no_match"
-        httpMethod: "PUT"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
 

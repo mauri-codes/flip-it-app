@@ -55,6 +55,33 @@ Resources:
                 Resource:
                   - !GetAtt CollectionsTable.Arn
 
+  BluebirdGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bluebird-gateway-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - apigateway.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Policies:
+        - PolicyName: bluebird-gateway-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: "arn:aws:logs:*:*:*"
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+
   BluebirdAPI:
     Type: AWS::Serverless::Api
     Properties:

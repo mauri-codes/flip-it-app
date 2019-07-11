@@ -3,75 +3,73 @@ var AWS = require('aws-sdk');
 
 var dynamo = new AWS.DynamoDB.DocumentClient()
 var collectionsTable = process.env.COLLECTIONS_TABLE
+var tableKey = "collectionId";
 
 let response;
 
-exports.get = async (event, context) => {
+exports.get = async ({pathParameters}, context) => {
     try {
-        console.log({event: event})
-        console.log({context: context})
-        var outcome = await getDynamoItem(collectionsTable, "collectionId")
-        console.log(outcome)
+        collectionId = pathParameters[tableKey]
+        var collection = await getDynamoItem(collectionsTable, {"collectionId": collectionId})
         response = {
             'statusCode': 200,
-            'body': JSON.stringify([{
-                collection_id: 1,
-                name: "science"
-            },{
-                collection_id: 2,
-                name: "medicine"
-            }])
+            'body': JSON.stringify(collection),
+            'isBase64Encoded': false,
+            'headers': {
+                'Content-Type': 'application/json'
+            }
         }
     } catch (err) {
-        console.log(err);
-        return err;
+        response = {
+            'statusCode': 400,
+            'body': JSON.stringify(err),
+            'isBase64Encoded': false,
+            'headers': {
+                'Content-Type': 'application/json'
+            }
+        }
     }
 
     return response
 };
 
-exports.put = async (event, context) => {
+exports.put = async ({body}, context) => {
     try {
-        console.log({event: event})
-        console.log({context: context})
-        var item = {
-            'collectionId' : {S: '123'},
-            'name' : {S: 'Med cards'},
-            'user' : {S: 'Richard Roe'}
-          }
+        var item = JSON.parse(body)
         var outcome = await putDynamoItem(collectionsTable, item)
-        console.log(outcome)
         response = {
             'statusCode': 200,
-            'body': JSON.stringify([{
-                collection_id: 1,
-                name: "science"
-            },{
-                collection_id: 2,
-                name: "medicine"
-            }])
+            'body': JSON.stringify(outcome),
+            'isBase64Encoded': false,
+            'headers': {
+                'Content-Type': 'application/json'
+            }
         }
     } catch (err) {
-        console.log(err);
-        return err;
+        response = {
+            'statusCode': 400,
+            'body': JSON.stringify(err),
+            'isBase64Encoded': false,
+            'headers': {
+                'Content-Type': 'application/json'
+            }
+        }
     }
 
     return response
 };
 
-const getDynamoItem = (table, key) => {
+const getDynamoItem = (table, item) => {
     var params = {
         TableName: table,
-        Key: {
-            'KEY_NAME': {S: key}
-        }
+        Key: item
     }
     return new Promise((res, rej) => {
         dynamo.get(params, function(err, data) {
             if(err) {
                 rej(err);
             } else {
-                res(`Success ${data.Item}`);
+                res(data.Item);
             }
         })
     })
