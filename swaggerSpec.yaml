@@ -5,9 +5,16 @@ info:
   version: 1.0
 
 paths:
-  /collections:
+  /collection/{collectionId}:
     get:
       summary: Returns a list of collections by user
+      parameters:
+        - in: path
+          name: collectionId
+          schema:
+            type: string
+          required: true
+          description: composed by user and collectionName
       responses:
         "200":
           description: OK
@@ -32,6 +39,7 @@ paths:
         httpMethod: "GET"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
+  /collection:
     put:
       summary: saves or replaces a user collection
       responses:

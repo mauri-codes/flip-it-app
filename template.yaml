@@ -36,6 +36,15 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  - logs:CreateLogGroup
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: "arn:aws:logs:*:*:*"
+              - Effect: Allow
+                Action:
                   - dynamodb:DescribeTable
                   - dynamodb:UpdateTable
                   - dynamodb:DeleteItem
@@ -86,7 +95,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "BluebirdAPI"
-            Path: /collections
+            Path: /collection
             Method: GET
 
   PutCollection:
@@ -105,5 +114,5 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "BluebirdAPI"
-            Path: /collections
+            Path: /collection
             Method: PUT
