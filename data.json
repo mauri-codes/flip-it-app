@@ -1,0 +1,98 @@
+{
+   "collections": [
+      {
+         "collectionId": "global_science_deck",
+         "name": "Science Deck",
+         "user": "global",
+         "tag": false,
+         "cards": [
+            {
+               "id": "001",
+               "front": "science 1",
+               "back": "science back 1",
+               "tags": ["science_deck"]
+            },
+            {
+               "id": "002",
+               "front": "science 2",
+               "back": "science back 2",
+               "tags": ["science_deck", "math"]
+            }
+         ]
+      },
+      {
+         "collectionId": "global_math",
+         "name": "Math",
+         "user": "global",
+         "tag": true,
+         "cards": [
+            {
+               "id": "003",
+               "front": "math 1",
+               "back": "math back 1",
+               "tags": ["math"]
+            },
+            {
+               "id": "004",
+               "front": "math 2",
+               "back": "math back 2",
+               "tags": ["math"]
+            },
+            {
+               "id": "002",
+               "front": "science 2",
+               "back": "science back 2",
+               "tags": ["science_deck", "math"]
+            }
+         ]
+      },
+      {
+         "collectionId": "global_law",
+         "name": "Law",
+         "user": "global",
+         "tag": false,
+         "cards": [
+            {
+               "id": "005",
+               "front": "law 1",
+               "back": "law back 1",
+               "tags": ["politics", "retoric", "science"]
+            }
+         ]
+      },
+      {
+         "collectionId": "global_politics",
+         "name": "Politics",
+         "user": "global",
+         "tag": true,
+         "cards": [
+            {
+               "id": "005",
+               "front": "law 1",
+               "back": "law back 1",
+               "tags": ["politics", "retoric", "science"]
+            }
+         ]
+      },
+      {
+         "collectionId": "global_retoric",
+         "name": "Retoric",
+         "user": "global",
+         "tag": true,
+         "cards": [
+            {
+               "id": "005",
+               "front": "law 1",
+               "back": "law back 1",
+               "tags": ["politics", "retoric", "science"]
+            },
+            {
+               "id": "006",
+               "front": "retoric 1",
+               "back": "retoric back 1",
+               "tags": ["retoric"]
+            }
+         ]
+      }
+   ]
+}

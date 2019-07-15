@@ -6,22 +6,24 @@ var collectionsTable = process.env.COLLECTIONS_TABLE
 exports.post = async ({body}, context) => {
     try {
         body = JSON.parse(body)
-        ({cards, user} = body)
+        cards = body["cards"]
+        user = body["user"]
         var multipleItems = Array.isArray(cards)
         if (!multipleItems) {
             cards = [cards]
         }
 
         cardsByTag = groupByTag(cards)
-        var tagList = cardsByTag.forEach((group) => ({"collectionId": group["tag"]}))
+        var collectionList = cardsByTag.map((group) => ({"collectionId": `${user}_${group["tag"]}`}))
         
-        var collections = await getDynamoBatch(collectionsTable, tagList)
+        var collections = await getDynamoBatch(collectionsTable, collectionList)
 
-        console.log({
+        collections = collections["Responses"][collectionsTable]
+        console.log(JSON.stringify({
             collections: collections,
             cardsByTag: cardsByTag,
-            tagList: tagList
-        })
+            collectionList: collectionList
+        }))
 
         response = {
             'statusCode': 200,

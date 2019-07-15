@@ -52,6 +52,8 @@ Resources:
                   - dynamodb:PutItem
                   - dynamodb:Query
                   - dynamodb:UpdateItem
+                  - dynamodb:BatchGetItem
+                  - dynamodb:BatchWriteItem
                 Resource:
                   - !GetAtt CollectionsTable.Arn
 
