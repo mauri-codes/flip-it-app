@@ -95,8 +95,8 @@ Resources:
     Properties:
       TableName: bluebird-collections
       ProvisionedThroughput:
-        ReadCapacityUnits: 2
-        WriteCapacityUnits: 2
+        ReadCapacityUnits: 7
+        WriteCapacityUnits: 7
       AttributeDefinitions: 
         - 
           AttributeName: "collectionId"
@@ -122,7 +122,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "BluebirdAPI"
-            Path: /collection
+            Path: /collection/{collectionId}
             Method: GET
 
   PutCollection:
@@ -143,3 +143,22 @@ Resources:
             RestApiId: !Ref "BluebirdAPI"
             Path: /collection
             Method: PUT
+
+  AddCards:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: bluebird-add-cards
+      Runtime: nodejs8.10
+      Handler: cards.post
+      CodeUri: build
+      Role: !GetAtt BluebirdLambdaRole.Arn
+      Environment:
+        Variables:
+          COLLECTIONS_TABLE: !Ref CollectionsTable
+      Events:
+        PutCollectionsAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "BluebirdAPI"
+            Path: /cards
+            Method: POST
