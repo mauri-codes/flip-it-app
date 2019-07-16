@@ -35,8 +35,9 @@ exports.get = async ({pathParameters}, context) => {
 
 exports.put = async ({body}, context) => {
     try {
-        var item = JSON.parse(body)
-        var outcome = await putDynamoItem(collectionsTable, item)
+        var body = JSON.parse(body)
+        var items = body["collections"]
+        var outcome = await writeDynamoBatch(collectionsTable, items)
         response = {
             'statusCode': 200,
             'body': JSON.stringify(outcome),
@@ -85,6 +86,46 @@ const putDynamoItem = async (table, item) => {
                 rej(err);
             } else {
                 res("Success");
+            }
+        })
+    })
+}
+
+const getDynamoBatch = (table, keys) => {
+    var items = {}
+    items[table] = {
+        Keys: keys,
+        "ReturnConsumedCapacity": "TOTAL"
+    }
+    return new Promise((res, rej) => {
+        dynamo.batchGet({RequestItems: items}, function(err, data) {
+            if(err) {
+                rej(err);
+            } else {
+                res(data);
+            }
+        })
+    })
+}
+
+const writeDynamoBatch = (table, items) => {
+    items = items.map((item) => ({
+        PutRequest: {
+            Item: item
+        }
+    }))
+    var itemList = {}
+    itemList[table] = items
+    params = {
+        RequestItems: itemList,
+        "ReturnConsumedCapacity": "TOTAL"
+    }
+    return new Promise((res, rej) => {
+        dynamo.batchWrite(params, function(err, data) {
+            if(err) {
+                rej(err);
+            } else {
+                res(data);
             }
         })
     })
