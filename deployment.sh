@@ -1,7 +1,7 @@
-export AWS_ACCOUNT=686004655717
-export AWS_REGION=us-east-2
+export AWS_ACCOUNT=972073858291
+export AWS_REGION=us-east-1
 export STAGE_NAME=dev
-export DEPLOYMENTS_BUCKET=mau-deployments
+export DEPLOYMENTS_BUCKET=mauri-deployments
 
 
 if [ $1 = "-c" ] || [ $1 = "--create" ]
