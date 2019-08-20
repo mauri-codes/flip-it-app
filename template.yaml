@@ -10,6 +10,15 @@ Parameters:
     Type: String
     Description: Current Stage
     Default: dev
+  DomainName:
+    Type: String
+    Description: Domain Name
+  Certificate:
+    Type: String
+    Description: ACM Certificate
+  HostedZoneId:
+    Type: String
+    Description: Hosted Zone
 
 Globals:
   Function:
@@ -145,3 +154,33 @@ Resources:
             RestApiId: !Ref "BluebirdAPI"
             Path: /collection
             Method: PUT
+
+  CustomDomain:
+    Type: AWS::ApiGateway::DomainName
+    DependsOn: BluebirdAPI
+    Properties:
+      DomainName: !Ref DomainName
+      EndpointConfiguration:
+        Types:
+          - "EDGE"
+      CertificateArn: !Ref Certificate
+
+  CustomDomainMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !Ref CustomDomain
+      RestApiId: !Ref BluebirdAPI
+      Stage: !Ref StageName
+
+  CustomDomainDNS:
+    Type: AWS::Route53::RecordSetGroup
+    DependsOn: CustomDomain
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      RecordSets:
+      - Type: A
+        Name: !Ref DomainName
+        AliasTarget:
+          HostedZoneId: !GetAtt CustomDomain.DistributionHostedZoneId
+          DNSName: !GetAtt CustomDomain.DistributionDomainName
+

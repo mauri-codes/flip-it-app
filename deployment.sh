@@ -1,7 +1,10 @@
 export AWS_ACCOUNT=972073858291
-export AWS_REGION=us-east-1
+export AWS_REGION=us-east-2
 export STAGE_NAME=dev
 export DEPLOYMENTS_BUCKET=mauri-deployments
+export DOMAIN_NAME="api.bluebird.mauridev.net"
+export CERTIFICATE="arn:aws:acm:us-east-1:972073858291:certificate/860f71db-bfb9-4f05-b31a-ad03ef3c6ce3"
+export HOSTED_ZONE_ID="/hostedzone/Z1IUAUSKRI6O7T"
 
 
 if [ $1 = "-c" ] || [ $1 = "--create" ]
@@ -32,10 +35,13 @@ then
 
   sam deploy \
     --template-file packaged.yaml \
-    --stack-name blue-bird \
+    --stack-name bluebird \
     --capabilities CAPABILITY_NAMED_IAM \
     --parameter-overrides \
       StageName=$STAGE_NAME \
+      DomainName=$DOMAIN_NAME \
+      Certificate=$CERTIFICATE \
+      HostedZoneId=$HOSTED_ZONE_ID \
       DeploymentBucket=$DEPLOYMENTS_BUCKET
 
   cp original-swagger.yaml swaggerSpec.yaml
@@ -47,5 +53,5 @@ fi
 
 if [ $1 = "-d" ] || [ $1 = "--delete" ]
 then
-  aws cloudformation delete-stack --stack-name blue-bird
+  aws cloudformation delete-stack --stack-name bluebird
 fi
