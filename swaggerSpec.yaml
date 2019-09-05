@@ -5,6 +5,36 @@ info:
   version: 1.0
 
 paths:
+  /user/{userName}:
+    get:
+      summary: Returns bluebird user information
+      parameters:
+        - in: path
+          name: userName
+          schema:
+            type: string
+          required: true
+          description: userName
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: The specified user ID is invalid.
+        "500":
+          description: Bad request.
+        default:
+          description: Unexpected error.
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-get-user/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/bluebird-gateway-role"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+
   /collection/{collectionId}:
     get:
       summary: Returns a list of collections by user

@@ -65,6 +65,7 @@ Resources:
                   - dynamodb:BatchWriteItem
                 Resource:
                   - !GetAtt CollectionsTable.Arn
+                  - !GetAtt BluebirdUsersTable.Arn
 
   BluebirdGatewayRole:
     Type: AWS::IAM::Role
@@ -100,6 +101,41 @@ Resources:
       DefinitionUri: swaggerSpec.yaml
       StageName:
         Ref: StageName
+
+  BluebirdUsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: bluebird-users
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      AttributeDefinitions: 
+        - 
+          AttributeName: "userName"
+          AttributeType: "S"
+      KeySchema:
+        - 
+          AttributeName: "userName"
+          KeyType: "HASH"
+
+  GetBluebirdUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: bluebird-get-user
+      Runtime: nodejs8.10
+      Handler: users.get
+      CodeUri: build
+      Role: !GetAtt BluebirdLambdaRole.Arn
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref BluebirdUsersTable
+      Events:
+        GetBluebirdUserAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "BluebirdAPI"
+            Path: /user/{userName}
+            Method: GET
 
   CollectionsTable:
     Type: AWS::DynamoDB::Table
