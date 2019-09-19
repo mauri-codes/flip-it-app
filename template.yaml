@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: bluebird infrastructure
+Description: flip it app infrastructure
 
 Parameters:
   DeploymentBucket:
@@ -25,10 +25,10 @@ Globals:
     Timeout: 3
 
 Resources:
-  BluebirdLambdaRole:
+  FlipLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: bluebird-lambda-role
+      RoleName: fp-lambda-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -39,7 +39,7 @@ Resources:
           Action:
             - sts:AssumeRole
       Policies:
-        - PolicyName: bluebird-lambda-policy
+        - PolicyName: fp-lambda-policy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -64,13 +64,12 @@ Resources:
                   - dynamodb:BatchGetItem
                   - dynamodb:BatchWriteItem
                 Resource:
-                  - !GetAtt CollectionsTable.Arn
-                  - !GetAtt BluebirdUsersTable.Arn
+                  - !GetAtt FlipTable.Arn
 
-  BluebirdGatewayRole:
+  FlipGatewayRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: bluebird-gateway-role
+      RoleName: fp-gateway-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -81,7 +80,7 @@ Resources:
           Action:
             - sts:AssumeRole
       Policies:
-        - PolicyName: bluebird-gateway-policy
+        - PolicyName: fp-gateway-policy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -94,106 +93,115 @@ Resources:
                   - lambda:InvokeFunction
                 Resource: "*"
 
-  BluebirdAPI:
+  FlipAPI:
     Type: AWS::Serverless::Api
     Properties:
-      Name: bluebird-api
+      Name: fp-api
       DefinitionUri: swaggerSpec.yaml
       StageName:
         Ref: StageName
 
-  BluebirdUsersTable:
+  FlipTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: bluebird-users
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-      AttributeDefinitions: 
-        - 
-          AttributeName: "userName"
-          AttributeType: "S"
-      KeySchema:
-        - 
-          AttributeName: "userName"
-          KeyType: "HASH"
-
-  GetBluebirdUser:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: bluebird-get-user
-      Runtime: nodejs8.10
-      Handler: users.get
-      CodeUri: build
-      Role: !GetAtt BluebirdLambdaRole.Arn
-      Environment:
-        Variables:
-          USERS_TABLE: !Ref BluebirdUsersTable
-      Events:
-        GetBluebirdUserAPI:
-          Type: Api
-          Properties:
-            RestApiId: !Ref "BluebirdAPI"
-            Path: /user/{userName}
-            Method: GET
-
-  CollectionsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: bluebird-collections
+      TableName: fp-table
       ProvisionedThroughput:
         ReadCapacityUnits: 7
         WriteCapacityUnits: 7
       AttributeDefinitions: 
         - 
-          AttributeName: "collectionId"
+          AttributeName: "pk"
+          AttributeType: "S"
+        - 
+          AttributeName: "sk"
           AttributeType: "S"
       KeySchema:
         - 
-          AttributeName: "collectionId"
+          AttributeName: "pk"
           KeyType: "HASH"
+        - 
+          AttributeName: "sk"
+          KeyType: "RANGE"
 
-  GetCollection:
+  FlipGetUser:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: bluebird-get-collection
+      FunctionName: fp-get-user
       Runtime: nodejs8.10
-      Handler: collections.get
+      Handler: users.get
       CodeUri: build
-      Role: !GetAtt BluebirdLambdaRole.Arn
+      Role: !GetAtt FlipLambdaRole.Arn
       Environment:
         Variables:
-          COLLECTIONS_TABLE: !Ref CollectionsTable
+          FLIP_TABLE: !Ref FlipTable
       Events:
-        GetCollectionAPI:
+        FlipGetUserAPI:
           Type: Api
           Properties:
-            RestApiId: !Ref "BluebirdAPI"
-            Path: /collection/{collectionId}
+            RestApiId: !Ref "FlipAPI"
+            Path: /user/{userId}
             Method: GET
 
-  PutCollection:
+  FlipGetDeck:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: bluebird-put-collection
+      FunctionName: fp-get-deck
       Runtime: nodejs8.10
-      Handler: collections.put
+      Handler: decks.get
       CodeUri: build
-      Role: !GetAtt BluebirdLambdaRole.Arn
+      Role: !GetAtt FlipLambdaRole.Arn
       Environment:
         Variables:
-          COLLECTIONS_TABLE: !Ref CollectionsTable
+          FLIP_TABLE: !Ref FlipTable
       Events:
-        PutCollectionsAPI:
+        FlipGetDeckAPI:
           Type: Api
           Properties:
-            RestApiId: !Ref "BluebirdAPI"
-            Path: /collection
+            RestApiId: !Ref "FlipAPI"
+            Path: /deck/{deckId}
+            Method: GET
+
+  FlipPutDeck:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fp-put-deck
+      Runtime: nodejs8.10
+      Handler: decks.put
+      CodeUri: build
+      Role: !GetAtt FlipLambdaRole.Arn
+      Environment:
+        Variables:
+          FLIP_TABLE: !Ref FlipTable
+      Events:
+        FlipPutDeckAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "FlipAPI"
+            Path: /deck
             Method: PUT
 
-  CustomDomain:
+  FlipDeleteDeck:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fp-delete-deck
+      Runtime: nodejs8.10
+      Handler: decks.delete
+      CodeUri: build
+      Role: !GetAtt FlipLambdaRole.Arn
+      Environment:
+        Variables:
+          FLIP_TABLE: !Ref FlipTable
+      Events:
+        FlipDeleteDeckAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "FlipAPI"
+            Path: /deck
+            Method: DELETE
+
+  FlipCustomDomain:
     Type: AWS::ApiGateway::DomainName
-    DependsOn: BluebirdAPI
+    DependsOn: FlipAPI
     Properties:
       DomainName: !Ref DomainName
       EndpointConfiguration:
@@ -201,22 +209,22 @@ Resources:
           - "EDGE"
       CertificateArn: !Ref Certificate
 
-  CustomDomainMapping:
+  FlipCustomDomainMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      DomainName: !Ref CustomDomain
-      RestApiId: !Ref BluebirdAPI
+      DomainName: !Ref FlipCustomDomain
+      RestApiId: !Ref FlipAPI
       Stage: !Ref StageName
 
-  CustomDomainDNS:
+  FlipCustomDomainDNS:
     Type: AWS::Route53::RecordSetGroup
-    DependsOn: CustomDomain
+    DependsOn: FlipCustomDomain
     Properties:
       HostedZoneId: !Ref HostedZoneId
       RecordSets:
       - Type: A
         Name: !Ref DomainName
         AliasTarget:
-          HostedZoneId: !GetAtt CustomDomain.DistributionHostedZoneId
-          DNSName: !GetAtt CustomDomain.DistributionDomainName
+          HostedZoneId: !GetAtt FlipCustomDomain.DistributionHostedZoneId
+          DNSName: !GetAtt FlipCustomDomain.DistributionDomainName
 

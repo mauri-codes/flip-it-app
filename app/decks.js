@@ -1,23 +1,23 @@
-let { getDynamoItem } = require('./utils/dynamo.js')
-const axios = require('axios')
+let { getDynamoItem, putDynamoItem, deleteDynamoItem } = require('./utils/dynamo.js')
 var AWS = require('aws-sdk')
 
 var dynamo = new AWS.DynamoDB.DocumentClient()
-var collectionsTable = process.env.COLLECTIONS_TABLE
-var tableKey = "collectionId"
+var flipTable = process.env.FLIP_TABLE
 
 let response;
 
 exports.get = async ({pathParameters}, context) => {
     try {
-        collectionId = pathParameters[tableKey]
-        var collection = await getDynamoItem(collectionsTable, {"collectionId": collectionId})
+        deckId = pathParameters["deckId"]
+        console.log(deckId)
+        var deck = await getDynamoItem(flipTable, {pk: `deck:${deckId}`, sk: `deck:${deckId}`})
         response = {
             'statusCode': 200,
-            'body': JSON.stringify(collection),
+            'body': JSON.stringify(deck),
             'isBase64Encoded': false,
             'headers': {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
             }
         }
     } catch (err) {
@@ -26,7 +26,8 @@ exports.get = async ({pathParameters}, context) => {
             'body': JSON.stringify(err),
             'isBase64Encoded': false,
             'headers': {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
             }
         }
     }
@@ -37,14 +38,20 @@ exports.get = async ({pathParameters}, context) => {
 exports.put = async ({body}, context) => {
     try {
         var body = JSON.parse(body)
-        var items = body["collections"]
-        var outcome = await writeDynamoBatch(collectionsTable, items)
+        var {deckId, userId, ...items} = body["deck"]
+        var params = {
+            pk: `user:${userId}`,
+            sk: `deck:${deckId}`,
+            ...items
+        }
+        var outcome = await putDynamoItem(flipTable, params)
         response = {
             'statusCode': 200,
             'body': JSON.stringify(outcome),
             'isBase64Encoded': false,
             'headers': {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
             }
         }
     } catch (err) {
@@ -53,7 +60,8 @@ exports.put = async ({body}, context) => {
             'body': JSON.stringify(err),
             'isBase64Encoded': false,
             'headers': {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
             }
         }
     }
@@ -61,21 +69,38 @@ exports.put = async ({body}, context) => {
     return response
 };
 
-const putDynamoItem = async (table, item) => {
-    var params = {
-        TableName: table,
-        Item: item
-    }
-    return new Promise((res, rej) => {
-        dynamo.put(params, function(err, data) {
-            if(err) {
-                rej(err);
-            } else {
-                res("Success");
+exports.delete = async ({body}, context) => {
+    try {
+        var body = JSON.parse(body)
+        var {deckId, userId} = body["deck"]
+        var params = {
+            pk: `user:${userId}`,
+            sk: `deck:${deckId}`
+        }
+        var outcome = await deleteDynamoItem(flipTable, params)
+        response = {
+            'statusCode': 200,
+            'body': JSON.stringify(outcome),
+            'isBase64Encoded': false,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
             }
-        })
-    })
-}
+        }
+    } catch (err) {
+        response = {
+            'statusCode': 400,
+            'body': JSON.stringify(err),
+            'isBase64Encoded': false,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        }
+    }
+
+    return response
+};
 
 const getDynamoBatch = (table, keys) => {
     var items = {}

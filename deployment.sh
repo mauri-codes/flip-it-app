@@ -2,8 +2,8 @@ export AWS_ACCOUNT=972073858291
 export AWS_REGION=us-east-2
 export STAGE_NAME=dev
 export DEPLOYMENTS_BUCKET=mauri-deployments
-export DOMAIN_NAME="api.bluebird.mauridev.net"
-export CERTIFICATE="arn:aws:acm:us-east-1:972073858291:certificate/860f71db-bfb9-4f05-b31a-ad03ef3c6ce3"
+export DOMAIN_NAME="api.flip.mauridev.net"
+export CERTIFICATE="arn:aws:acm:us-east-1:972073858291:certificate/bdf31f78-5e34-4bf7-a098-075b39f205ec"
 export HOSTED_ZONE_ID="/hostedzone/Z1IUAUSKRI6O7T"
 
 
@@ -35,7 +35,7 @@ then
 
   sam deploy \
     --template-file packaged.yaml \
-    --stack-name bluebird \
+    --stack-name flip \
     --capabilities CAPABILITY_NAMED_IAM \
     --parameter-overrides \
       StageName=$STAGE_NAME \
@@ -53,5 +53,5 @@ fi
 
 if [ $1 = "-d" ] || [ $1 = "--delete" ]
 then
-  aws cloudformation delete-stack --stack-name bluebird
+  aws cloudformation delete-stack --stack-name flip
 fi

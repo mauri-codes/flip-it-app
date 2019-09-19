@@ -1,20 +1,20 @@
 openapi: 3.0.0
 
 info:
-  title: blue bird flashcards API
+  title: flip it app flashcards API
   version: 1.0
 
 paths:
-  /user/{userName}:
+  /user/{userId}:
     get:
-      summary: Returns bluebird user information
+      summary: Returns user information
       parameters:
         - in: path
-          name: userName
+          name: userId
           schema:
             type: string
           required: true
-          description: userName
+          description: userId
       responses:
         "200":
           description: OK
@@ -25,8 +25,8 @@ paths:
         default:
           description: Unexpected error.
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-get-user/invocations"
-        credentials: "arn:aws:iam::{{Account}}:role/bluebird-gateway-role"
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:fp-get-user/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/fp-gateway-role"
         responses:
           default:
             statusCode: "200"
@@ -35,16 +35,16 @@ paths:
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
 
-  /collection/{collectionId}:
+  /deck/{deckId}:
     get:
-      summary: Returns a list of collections by user
+      summary: Returns a list of decks by user
       parameters:
         - in: path
-          name: collectionId
+          name: deckId
           schema:
             type: string
           required: true
-          description: composed by user and collectionName
+          description: composed by userName and deckName
       responses:
         "200":
           description: OK
@@ -53,7 +53,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Collection'
+                  $ref: '#/components/schemas/Deck'
         "400":
           description: The specified user ID is invalid.
         "500":
@@ -61,8 +61,8 @@ paths:
         default:
           description: Unexpected error.
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-get-collection/invocations"
-        credentials: "arn:aws:iam::{{Account}}:role/bluebird-gateway-role"
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:fp-get-deck/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/fp-gateway-role"
         responses:
           default:
             statusCode: "200"
@@ -71,9 +71,9 @@ paths:
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
 
-  /collection:
+  /deck:
     put:
-      summary: saves or replaces a list of collections
+      summary: saves or replaces a list of decks
       responses:
         "200":
           description: OK
@@ -84,8 +84,8 @@ paths:
         default:
           description: Unexpected error.
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:bluebird-put-collection/invocations"
-        credentials: "arn:aws:iam::{{Account}}:role/bluebird-gateway-role"
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:fp-put-deck/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/fp-gateway-role"
         responses:
           default:
             statusCode: "200"
@@ -96,15 +96,12 @@ paths:
 
 components:
   schemas:
-    Collection:
+    Deck:
       type: object
       properties:
-        collectionId:
-          type: string
         name:
           type: string
         owner:
           type: string
       required:
-        - collectionId
         - name

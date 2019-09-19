@@ -1,20 +1,20 @@
 let { getDynamoItem } = require('./utils/dynamo.js')
 
-var usersTable = process.env.USERS_TABLE
-var tableKey = "userName";
+var flipTable = process.env.FLIP_TABLE
 
 let response;
 
 exports.get = async ({pathParameters}, context) => {
   try {
-      let userName = pathParameters[tableKey]
-      var user = await getDynamoItem(usersTable, {"userName": userName})
+      let userId = pathParameters["userId"]
+      var user = await getDynamoItem(flipTable, {pk: `user:${userId}`, sk: `user:${userId}`})
       response = {
           'statusCode': 200,
           'body': JSON.stringify(user),
           'isBase64Encoded': false,
           'headers': {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
           }
       }
   } catch (err) {
@@ -23,7 +23,8 @@ exports.get = async ({pathParameters}, context) => {
           'body': JSON.stringify(err),
           'isBase64Encoded': false,
           'headers': {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
           }
       }
   }
