@@ -1,4 +1,4 @@
-let { getDynamoItem, putDynamoItem, deleteDynamoItem } = require('./utils/dynamo.js')
+let { queryPK, putDynamoItem, deleteDynamoItem } = require('./utils/dynamo.js')
 var AWS = require('aws-sdk')
 
 var dynamo = new AWS.DynamoDB.DocumentClient()
@@ -9,8 +9,7 @@ let response;
 exports.get = async ({pathParameters}, context) => {
     try {
         deckId = pathParameters["deckId"]
-        console.log(deckId)
-        var deck = await getDynamoItem(flipTable, {pk: `deck:${deckId}`, sk: `deck:${deckId}`})
+        var deck = await queryPK(flipTable, `deck:${deckId}`)
         response = {
             'statusCode': 200,
             'body': JSON.stringify(deck),

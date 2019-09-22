@@ -49,4 +49,23 @@ const deleteDynamoItem = (table, item) => {
     })
 }
 
-module.exports = { getDynamoItem, putDynamoItem, deleteDynamoItem }
+const queryPK = (table, pk) => {
+    var params = {
+        TableName: table,
+        KeyConditionExpression: 'pk = :hkey',
+        ExpressionAttributeValues: {
+            ':hkey': pk
+        }
+    }
+    return new Promise((res, rej) => {
+        dynamo.query(params, function(err, data) {
+            if(err) {
+                rej(err);
+            } else {
+                res(data.Items);
+            }
+        })
+    })
+}
+
+module.exports = { getDynamoItem, putDynamoItem, deleteDynamoItem, queryPK }

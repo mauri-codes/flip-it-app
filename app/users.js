@@ -1,4 +1,4 @@
-let { getDynamoItem } = require('./utils/dynamo.js')
+let { queryPK } = require('./utils/dynamo.js')
 
 var flipTable = process.env.FLIP_TABLE
 
@@ -7,7 +7,7 @@ let response;
 exports.get = async ({pathParameters}, context) => {
   try {
       let userId = pathParameters["userId"]
-      var user = await getDynamoItem(flipTable, {pk: `user:${userId}`, sk: `user:${userId}`})
+      var user = await queryPK(flipTable,  `user:${userId}`)
       response = {
           'statusCode': 200,
           'body': JSON.stringify(user),
