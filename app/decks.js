@@ -9,6 +9,7 @@ let response;
 exports.get = async ({pathParameters}, context) => {
     try {
         deckId = pathParameters["deckId"]
+        deckId = deckId.split('-').join('#')
         var deck = await queryPK(flipTable, `deck:${deckId}`)
         response = {
             'statusCode': 200,

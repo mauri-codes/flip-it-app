@@ -119,5 +119,6 @@ module.exports = {
     getDynamoItem,
     putDynamoItem,
     writeDynamoBatch,
-    deleteDynamoItem
+    deleteDynamoItem,
+    deleteDynamoBatch
 }
