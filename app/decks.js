@@ -10,10 +10,19 @@ exports.get = async ({pathParameters}, context) => {
     try {
         deckId = pathParameters["deckId"]
         deckId = deckId.split('-').join('#')
-        var deck = await queryPK(flipTable, `deck:${deckId}`)
+        const deckKey = `deck:${deckId}`
+        let deckData = await queryPK(flipTable, deckKey)
+        deckData = deckData.reduce ((deckSummary, deckRecord) => {
+            if (deckRecord.sk == deckKey) {
+                deckSummary = {...deckSummary, ...deckRecord}
+            } else {
+                deckSummary.cards.push(deckRecord)
+            }
+            return deckSummary
+        }, {cards: []})
         response = {
             'statusCode': 200,
-            'body': JSON.stringify(deck),
+            'body': JSON.stringify(deckData),
             'isBase64Encoded': false,
             'headers': {
                 'Content-Type': 'application/json',
