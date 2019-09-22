@@ -94,6 +94,28 @@ paths:
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
 
+    delete:
+      summary: deletes all information regarding deckId
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: The specified user ID is invalid.
+        "500":
+          description: Bad request.
+        default:
+          description: Unexpected error.
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:fp-delete-deck/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/fp-gateway-role"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+
 components:
   schemas:
     Deck:

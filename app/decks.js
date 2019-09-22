@@ -46,9 +46,9 @@ exports.get = async ({pathParameters}, context) => {
 
 exports.put = async ({body}, context) => {
     try {
-        var body = JSON.parse(body)
-        var {deckId, userId, ...DeckData} = body["deck"]
-        var items = [
+        let body = JSON.parse(body)
+        let {deckId, userId, ...DeckData} = body
+        let items = [
             {
                 pk: `user:${userId}`,
                 sk: `deck:${deckId}`,
@@ -87,14 +87,18 @@ exports.put = async ({body}, context) => {
 
 exports.delete = async ({body}, context) => {
     try {
-        var body = JSON.parse(body)
-        var {deckId, userId} = body["deck"]
-        var decks = await queryPK(flipTable, `deck:${deckId}`)
-        var items = decks.map(deck => ({
+        let body = JSON.parse(body)
+        let { deckId, userId } = body
+        let decks = await queryPK(flipTable, `deck:${deckId}`)
+        let items = decks.map(deck => ({
             pk: deck.pk,
             sk: deck.sk
         }))
-        var outcome = await deleteDynamoBatch(flipTable, items)
+        items.push({
+            pk: `user:${userId}`,
+            sk: `deck:${deckId}`
+        })
+        let outcome = await deleteDynamoBatch(flipTable, items)
         response = {
             'statusCode': 200,
             'body': JSON.stringify(outcome),
@@ -120,7 +124,7 @@ exports.delete = async ({body}, context) => {
 };
 
 const getDynamoBatch = (table, keys) => {
-    var items = {}
+    let items = {}
     items[table] = {
         Keys: keys,
         "ReturnConsumedCapacity": "TOTAL"

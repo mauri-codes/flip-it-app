@@ -7,7 +7,7 @@ let response;
 exports.get = async ({pathParameters}, context) => {
   try {
       let userId = pathParameters["userId"]
-      var user = await queryPK(flipTable,  `user:${userId}`)
+      let user = await queryPK(flipTable,  `user:${userId}`)
       response = {
           'statusCode': 200,
           'body': JSON.stringify(user),

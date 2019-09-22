@@ -36,7 +36,7 @@ const putDynamoItem = (table, item) => {
 const deleteDynamoItem = (table, item) => {
     var params = {
         TableName: table,
-        Item: item
+        Key: item
     }
     return new Promise((res, rej) => {
         dynamo.delete(params, function(err, data) {
@@ -94,7 +94,7 @@ const writeDynamoBatch = (table, items) => {
 const deleteDynamoBatch = (table, items) => {
     items = items.map((item) => ({
         DeleteRequest: {
-            Item: item
+            Key: item
         }
     }))
     var itemList = {}
