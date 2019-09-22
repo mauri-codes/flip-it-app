@@ -1,4 +1,4 @@
-let { queryPK, putDynamoItem, deleteDynamoItem } = require('./utils/dynamo.js')
+let { queryPK, deleteDynamoBatch, writeDynamoBatch } = require('./utils/dynamo.js')
 var AWS = require('aws-sdk')
 
 var dynamo = new AWS.DynamoDB.DocumentClient()
@@ -37,13 +37,20 @@ exports.get = async ({pathParameters}, context) => {
 exports.put = async ({body}, context) => {
     try {
         var body = JSON.parse(body)
-        var {deckId, userId, ...items} = body["deck"]
-        var params = {
-            pk: `user:${userId}`,
-            sk: `deck:${deckId}`,
-            ...items
-        }
-        var outcome = await putDynamoItem(flipTable, params)
+        var {deckId, userId, ...DeckData} = body["deck"]
+        var items = [
+            {
+                pk: `user:${userId}`,
+                sk: `deck:${deckId}`,
+                ...DeckData
+            },
+            {
+                pk: `deck:${deckId}`,
+                sk: `deck:${deckId}`,
+                ...DeckData
+            }
+        ]
+        var outcome = await writeDynamoBatch(flipTable, items)
         response = {
             'statusCode': 200,
             'body': JSON.stringify(outcome),
@@ -72,11 +79,12 @@ exports.delete = async ({body}, context) => {
     try {
         var body = JSON.parse(body)
         var {deckId, userId} = body["deck"]
-        var params = {
-            pk: `user:${userId}`,
-            sk: `deck:${deckId}`
-        }
-        var outcome = await deleteDynamoItem(flipTable, params)
+        var decks = await queryPK(flipTable, `deck:${deckId}`)
+        var items = decks.map(deck => ({
+            pk: deck.pk,
+            sk: deck.sk
+        }))
+        var outcome = await deleteDynamoBatch(flipTable, items)
         response = {
             'statusCode': 200,
             'body': JSON.stringify(outcome),
@@ -109,29 +117,6 @@ const getDynamoBatch = (table, keys) => {
     }
     return new Promise((res, rej) => {
         dynamo.batchGet({RequestItems: items}, function(err, data) {
-            if(err) {
-                rej(err);
-            } else {
-                res(data);
-            }
-        })
-    })
-}
-
-const writeDynamoBatch = (table, items) => {
-    items = items.map((item) => ({
-        PutRequest: {
-            Item: item
-        }
-    }))
-    var itemList = {}
-    itemList[table] = items
-    params = {
-        RequestItems: itemList,
-        "ReturnConsumedCapacity": "TOTAL"
-    }
-    return new Promise((res, rej) => {
-        dynamo.batchWrite(params, function(err, data) {
             if(err) {
                 rej(err);
             } else {

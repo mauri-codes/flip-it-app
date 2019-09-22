@@ -68,4 +68,56 @@ const queryPK = (table, pk) => {
     })
 }
 
-module.exports = { getDynamoItem, putDynamoItem, deleteDynamoItem, queryPK }
+const writeDynamoBatch = (table, items) => {
+    items = items.map((item) => ({
+        PutRequest: {
+            Item: item
+        }
+    }))
+    var itemList = {}
+    itemList[table] = items
+    params = {
+        RequestItems: itemList,
+        "ReturnConsumedCapacity": "TOTAL"
+    }
+    return new Promise((res, rej) => {
+        dynamo.batchWrite(params, function(err, data) {
+            if(err) {
+                rej(err);
+            } else {
+                res(data);
+            }
+        })
+    })
+}
+
+const deleteDynamoBatch = (table, items) => {
+    items = items.map((item) => ({
+        DeleteRequest: {
+            Item: item
+        }
+    }))
+    var itemList = {}
+    itemList[table] = items
+    params = {
+        RequestItems: itemList,
+        "ReturnConsumedCapacity": "TOTAL"
+    }
+    return new Promise((res, rej) => {
+        dynamo.batchWrite(params, function(err, data) {
+            if(err) {
+                rej(err);
+            } else {
+                res(data);
+            }
+        })
+    })
+}
+
+module.exports = {
+    queryPK,
+    getDynamoItem,
+    putDynamoItem,
+    writeDynamoBatch,
+    deleteDynamoItem
+}
