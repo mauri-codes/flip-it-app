@@ -116,6 +116,107 @@ paths:
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
 
+  /deck/{deckId}/card/{cardId}:
+    get:
+      summary: Returns card for the given deck
+      parameters:
+        - in: path
+          name: deckId
+          schema:
+            type: string
+          required: true
+          description: deckId
+        - in: path
+          name: cardId
+          schema:
+            type: string
+          required: true
+          description: cardId
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: The specified user ID is invalid.
+        "500":
+          description: Bad request.
+        default:
+          description: Unexpected error.
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:fp-get-card/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/fp-gateway-role"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+
+    delete:
+      summary: saves or updates card
+      parameters:
+        - in: path
+          name: deckId
+          schema:
+            type: string
+          required: true
+          description: deckId
+        - in: path
+          name: cardId
+          schema:
+            type: string
+          required: true
+          description: cardId
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: The specified user ID is invalid.
+        "500":
+          description: Bad request.
+        default:
+          description: Unexpected error.
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:fp-delete-card/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/fp-gateway-role"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+
+  /deck/{deckId}/card:
+    put:
+      summary: saves or updates card
+      parameters:
+        - in: path
+          name: deckId
+          schema:
+            type: string
+          required: true
+          description: deckId
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: The specified user ID is invalid.
+        "500":
+          description: Bad request.
+        default:
+          description: Unexpected error.
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:{{Region}}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{Region}}:{{Account}}:function:fp-put-card/invocations"
+        credentials: "arn:aws:iam::{{Account}}:role/fp-gateway-role"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+
 components:
   schemas:
     Deck:

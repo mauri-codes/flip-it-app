@@ -114,10 +114,32 @@ const deleteDynamoBatch = (table, items) => {
     })
 }
 
+const updateCardCount = (table, key, field, amount) => {
+    let params = {
+        TableName: table,
+        Key: key,
+        UpdateExpression: `set ${field} = ${field} + :val`,
+        ExpressionAttributeValues: {
+            ':val': amount
+        },
+        ReturnValues:"UPDATED_NEW"
+    }
+    return new Promise((res, rej) => {
+        dynamo.update(params, function(err, data) {
+            if(err) {
+                rej(err);
+            } else {
+                res(data);
+            }
+        })
+    })
+}
+
 module.exports = {
     queryPK,
     getDynamoItem,
     putDynamoItem,
+    updateCardCount,
     writeDynamoBatch,
     deleteDynamoItem,
     deleteDynamoBatch

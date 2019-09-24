@@ -199,6 +199,63 @@ Resources:
             Path: /deck
             Method: DELETE
 
+  FlipGetCard:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fp-get-card
+      Runtime: nodejs8.10
+      Handler: cards.get
+      CodeUri: build
+      Role: !GetAtt FlipLambdaRole.Arn
+      Environment:
+        Variables:
+          FLIP_TABLE: !Ref FlipTable
+      Events:
+        FlipGetDeckAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "FlipAPI"
+            Path: /deck/{deckId}/card/{cardId}
+            Method: GET
+
+  FlipPutCard:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fp-put-card
+      Runtime: nodejs8.10
+      Handler: cards.put
+      CodeUri: build
+      Role: !GetAtt FlipLambdaRole.Arn
+      Environment:
+        Variables:
+          FLIP_TABLE: !Ref FlipTable
+      Events:
+        FlipPutDeckAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "FlipAPI"
+            Path: /deck/{deckId}/card
+            Method: PUT
+
+  FlipDeleteCard:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: fp-delete-card
+      Runtime: nodejs8.10
+      Handler: cards.delete
+      CodeUri: build
+      Role: !GetAtt FlipLambdaRole.Arn
+      Environment:
+        Variables:
+          FLIP_TABLE: !Ref FlipTable
+      Events:
+        FlipPutDeckAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "FlipAPI"
+            Path: /deck/{deckId}/card/{cardId}
+            Method: DELETE
+
   FlipCustomDomain:
     Type: AWS::ApiGateway::DomainName
     DependsOn: FlipAPI
