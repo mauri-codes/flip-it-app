@@ -44,9 +44,9 @@ exports.get = async ({pathParameters}, context) => {
     return response
 };
 
-exports.put = async ({body}, context) => {
+exports.put = async ({requestBody}, context) => {
     try {
-        let body = JSON.parse(body)
+        let body = JSON.parse(requestBody)
         let {deckId, userId, ...DeckData} = body
         let items = [
             {
