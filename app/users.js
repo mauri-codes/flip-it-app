@@ -1,4 +1,5 @@
 let { queryPK } = require('./utils/dynamo.js')
+let { httpResponse } = require('./utils/requests.js')
 
 var flipTable = process.env.FLIP_TABLE
 
@@ -8,25 +9,9 @@ exports.get = async ({pathParameters}, context) => {
   try {
       let userId = pathParameters["userId"]
       let user = await queryPK(flipTable,  `user:${userId}`)
-      response = {
-          'statusCode': 200,
-          'body': JSON.stringify(user),
-          'isBase64Encoded': false,
-          'headers': {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-          }
-      }
+      response = httpResponse(200, user)
   } catch (err) {
-      response = {
-          'statusCode': 400,
-          'body': JSON.stringify(err),
-          'isBase64Encoded': false,
-          'headers': {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-          }
-      }
+      response = httpResponse(400, err)
   }
 
   return response

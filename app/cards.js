@@ -4,6 +4,7 @@ let {
     updateCardCount,
     deleteDynamoItem,
 } = require('./utils/dynamo.js')
+let { httpResponse } = require('./utils/requests.js')
 var AWS = require('aws-sdk')
 const uuidv1 = require('uuid/v1')
 
@@ -19,25 +20,9 @@ exports.get = async ({pathParameters}, context) => {
         deckId = deckId.split('-').join('#')
         let itemKey = {pk: `deck:${deckId}`, sk: `card:${cardId}`}
         let deckData = await getDynamoItem(flipTable, itemKey)
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify(deckData),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(200, deckData)
     } catch (err) {
-        response = {
-            'statusCode': 400,
-            'body': JSON.stringify(err),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(400, err)
     }
 
     return response
@@ -64,25 +49,9 @@ exports.put = async ({body, pathParameters}, context) => {
             await updateCardCount(flipTable, updateCountKey, 'cardCount', 1)
         }
         var outcome = await putDynamoItem(flipTable, cardData)
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify(outcome),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(200, outcome)
     } catch (err) {
-        response = {
-            'statusCode': 400,
-            'body': JSON.stringify(err),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(400, err)
     }
 
     return response
@@ -98,25 +67,9 @@ exports.delete = async ({pathParameters}, context) => {
         let deleteCardKey = {pk: `deck:${deckId}`, sk: `card:${cardId}`}
         await updateCardCount(flipTable, updateCountKey, 'cardCount', -1)
         let outcome = await deleteDynamoItem(flipTable, deleteCardKey)
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify(outcome),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(200, outcome)
     } catch (err) {
-        response = {
-            'statusCode': 400,
-            'body': JSON.stringify(err),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(400, err)
     }
 
     return response

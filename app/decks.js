@@ -1,4 +1,5 @@
 let { queryPK, deleteDynamoBatch, writeDynamoBatch } = require('./utils/dynamo.js')
+let { httpResponse } = require('./utils/requests.js')
 var AWS = require('aws-sdk')
 
 var dynamo = new AWS.DynamoDB.DocumentClient()
@@ -20,34 +21,18 @@ exports.get = async ({pathParameters}, context) => {
             }
             return deckSummary
         }, {cards: []})
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify(deckData),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(200, deckData)
     } catch (err) {
-        response = {
-            'statusCode': 400,
-            'body': JSON.stringify(err),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(400, err)
     }
 
     return response
 };
 
-exports.put = async ({requestBody}, context) => {
+exports.put = async ({body}, context) => {
     try {
-        let body = JSON.parse(requestBody)
-        let {deckId, userId, ...DeckData} = body
+        let requestBody = JSON.parse(body)
+        let {deckId, userId, ...DeckData} = requestBody
         let items = [
             {
                 pk: `user:${userId}`,
@@ -61,25 +46,9 @@ exports.put = async ({requestBody}, context) => {
             }
         ]
         var outcome = await writeDynamoBatch(flipTable, items)
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify(outcome),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(200, outcome)
     } catch (err) {
-        response = {
-            'statusCode': 400,
-            'body': JSON.stringify(err),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(400, err)
     }
 
     return response
@@ -99,25 +68,9 @@ exports.delete = async ({body}, context) => {
             sk: `deck:${deckId}`
         })
         let outcome = await deleteDynamoBatch(flipTable, items)
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify(outcome),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(200, outcome)
     } catch (err) {
-        response = {
-            'statusCode': 400,
-            'body': JSON.stringify(err),
-            'isBase64Encoded': false,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        }
+        response = httpResponse(400, err)
     }
 
     return response
