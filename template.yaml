@@ -196,7 +196,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "FlipAPI"
-            Path: /deck
+            Path: /deck/{deckId}
             Method: DELETE
 
   FlipGetCard:

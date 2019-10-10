@@ -54,10 +54,11 @@ exports.put = async ({body}, context) => {
     return response
 };
 
-exports.delete = async ({body}, context) => {
+exports.delete = async ({pathParameters}, context) => {
     try {
-        let body = JSON.parse(body)
-        let { deckId, userId } = body
+        let deckId = pathParameters["deckId"]
+        deckId = deckId.split('-').join('#')
+        let [userId] = deckId.split('#')
         let decks = await queryPK(flipTable, `deck:${deckId}`)
         let items = decks.map(deck => ({
             pk: deck.pk,
