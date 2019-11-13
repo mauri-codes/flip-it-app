@@ -19,6 +19,9 @@ Parameters:
   HostedZoneId:
     Type: String
     Description: Hosted Zone
+  UserPool:
+    Type: String
+    Description: User Pool ARN
 
 Globals:
   Function:
@@ -92,6 +95,14 @@ Resources:
                 Action:
                   - lambda:InvokeFunction
                 Resource: "*"
+              - Effect: Allow
+                Action:
+                  - apigateway:POST
+                Resource: "arn:aws:apigateway:*::/restapis/*/authorizers"
+              - Effect: Allow
+                Action:
+                  - apigateway:PATCH
+                Resource: "arn:aws:apigateway:*::/restapis/*/authorizers/*"
 
   FlipAPI:
     Type: AWS::Serverless::Api
@@ -255,6 +266,17 @@ Resources:
             RestApiId: !Ref "FlipAPI"
             Path: /deck/{deckId}/card/{cardId}
             Method: DELETE
+
+  FlipCognitoAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: fp-cognito-authorizer
+      Type: COGNITO_USER_POOLS
+      ProviderARNs:
+        - !Ref UserPool
+      RestApiId: !Ref FlipAPI
+      IdentitySource: method.request.header.Authorization
+      AuthorizerCredentials: !GetAtt FlipGatewayRole.Arn
 
   FlipCustomDomain:
     Type: AWS::ApiGateway::DomainName
