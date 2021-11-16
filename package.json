@@ -7,7 +7,7 @@
   "author": "Mauricio Alarcon",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.490.0",
+    "aws-sdk": "^2.814.0",
     "axios": "^0.18.0",
     "uuid": "^3.3.3"
   },
